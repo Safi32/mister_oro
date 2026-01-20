@@ -12,10 +12,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String _selectedRole = 'Vendedor';
   bool _obscurePassword = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Get the selected role from navigation arguments
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is String) {
+      setState(() {
+        _selectedRole = args;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -27,7 +39,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.surfaceWhite,
+      appBar: AppBar(
+        backgroundColor: AppColors.surfaceWhite,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_outlined,
+            color: AppColors.textPrimary,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -37,12 +60,70 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
-                _buildTitle(),
-                const SizedBox(height: 40),
-                _buildLoginForm(),
-                const SizedBox(height: 40),
-                _buildDemoCredentials(),
+                const SizedBox(height: 20),
+                _buildRoleDisplay(),
+                const SizedBox(height: 30),
+                AppTextField(
+                  controller: _emailController,
+                  labelText: 'Correo Electrónico',
+                  hintText: 'usuario@misteroro.com',
+                  prefixIcon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+                AppTextField(
+                  controller: _passwordController,
+                  labelText: 'Contraseña',
+                  hintText: '•••••••',
+                  prefixIcon: Icons.lock,
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
+                AppButton(
+                  text: 'Iniciar Sesión',
+                  onPressed: _handleLogin,
+                  backgroundColor: _getRoleColor(),
+                ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Volver a Selección',
+                    style: TextStyle(color: _getRoleColor()),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '¿No tienes cuenta?',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pushNamed(context, '/signup'),
+                      child: Text(
+                        'Registrarse',
+                        style: TextStyle(
+                          color: _getRoleColor(),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -51,106 +132,93 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
- 
-
-  Widget _buildTitle() {
-    return const Text(
-      'Inicio de Sesión Vendedor',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      ),
-    );
-  }
-
-  Widget _buildLoginForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          AppTextField(
-            controller: _emailController,
-            labelText: 'Correo Electrónico',
-            hintText: 'correo@ejemplo.com',
-            prefixIcon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese su correo';
-              }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                return 'Ingrese un correo válido';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-          AppTextField(
-            controller: _passwordController,
-            labelText: 'Contraseña',
-            hintText: '••••••••',
-            prefixIcon: Icons.lock_outline,
-            obscureText: _obscurePassword,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese su contraseña';
-              }
-              if (value.length < 6) {
-                return 'La contraseña debe tener al menos 6 caracteres';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 32),
-          AppButton(
-            text: 'Iniciar Sesión',
-            onPressed: _handleLogin,
-            isLoading: false,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDemoCredentials() {
+  Widget _buildRoleDisplay() {
     return AppCard(
-      backgroundColor: AppColors.goldAccent.withOpacity(0.1),
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Credenciales de Prueba',
+          const Text(
+            'Rol Seleccionado',
             style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryGold,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Correo: vendor@misteroro.com\nContraseña: vendor123',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12),
+          Row(
+            children: [
+              Icon(_getRoleIcon(), color: _getRoleColor(), size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _getRoleDisplayName(),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: _getRoleColor(),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+  IconData _getRoleIcon() {
+    switch (_selectedRole) {
+      case 'Vendedor':
+        return Icons.store;
+      case 'Verificador':
+        return Icons.verified_user;
+      case 'Administrador':
+        return Icons.admin_panel_settings;
+      default:
+        return Icons.store;
+    }
+  }
+
+  String _getRoleDisplayName() {
+    switch (_selectedRole) {
+      case 'Vendedor':
+        return 'Vendedor';
+      case 'Verificador':
+        return 'Verificador';
+      case 'Administrador':
+        return 'Administrador';
+      default:
+        return 'Vendedor';
+    }
+  }
+
+  Color _getRoleColor() {
+    switch (_selectedRole) {
+      case 'Vendedor':
+        return AppColors.primaryGold;
+      case 'Verificador':
+        return AppColors.primaryGold;
+      case 'Administrador':
+        return AppColors.primaryGold;
+      default:
+        return AppColors.primaryGold;
+    }
+  }
+
   void _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(context, '/vendor-dashboard');
+    
+    switch (_selectedRole) {
+      case 'Vendedor':
+        Navigator.pushReplacementNamed(context, '/vendor-dashboard');
+        break;
+      case 'Verificador':
+        Navigator.pushReplacementNamed(context, '/verifier');
+        break;
+      case 'Administrador':
+        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+        break;
     }
   }
 }

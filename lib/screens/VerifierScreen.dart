@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../widgets/AppAppBar.dart';
 import '../widgets/AppCard.dart';
-import '../widgets/ActionCard.dart';
 import '../widgets/StatCard.dart';
+import '../widgets/ActionCard.dart';
 import '../utils/AppColors.dart';
 
-class VendorDashboardScreen extends StatelessWidget {
-  const VendorDashboardScreen({super.key});
+class VerifierScreen extends StatelessWidget {
+  const VerifierScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class VendorDashboardScreen extends StatelessWidget {
       backgroundColor: AppColors.backgroundLight,
       appBar: AppAppBar(
         automaticallyImplyLeading: false,
-        title: 'Panel Vendedor',
+        title: 'Panel Verificador',
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -29,9 +29,9 @@ class VendorDashboardScreen extends StatelessWidget {
           children: [
             _buildWelcomeCard(),
             const SizedBox(height: 24),
-            _buildQuickActions(context),
+            _buildQuickActions(),
             const SizedBox(height: 24),
-            _buildStatsCards(),
+            _buildStatsOverview(),
             const SizedBox(height: 24),
             _buildRecentActivity(),
           ],
@@ -46,52 +46,46 @@ class VendorDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
-              Icon(
-                Icons.person,
-                color: AppColors.surfaceWhite,
-                size: 28,
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bienvenido',
-                      style: TextStyle(
-                        color: AppColors.surfaceWhite,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      'Juan Vendedor',
-                      style: TextStyle(
-                        color: AppColors.surfaceWhite,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          const Text(
+            'Bienvenido, Verificador',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.surfaceWhite,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Panel de Verificación y Contabilidad',
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.surfaceWhite,
+            ),
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.surfaceWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.goldAccent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.goldAccent.withOpacity(0.3)),
             ),
-            child: const Text(
-              'Vendedor',
-              style: TextStyle(
-                color: AppColors.surfaceWhite,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.verified_user,
+                  color: AppColors.primaryGold,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Acceso de Solo Lectura',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.surfaceWhite,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -99,7 +93,7 @@ class VendorDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,32 +115,32 @@ class VendorDashboardScreen extends StatelessWidget {
           childAspectRatio: 1.2,
           children: [
             ActionCard(
-              icon: Icons.add_shopping_cart,
-              title: 'Nueva Venta',
-              subtitle: 'Registrar venta',
-              color: AppColors.successGreen,
-              onTap: () => Navigator.pushNamed(context, '/enter-sales'),
-            ),
-            ActionCard(
               icon: Icons.receipt_long,
-              title: 'Mis Ventas',
-              subtitle: 'Ver historial',
+              title: 'Ver Ventas',
+              subtitle: 'Todos los registros',
               color: AppColors.infoBlue,
-              onTap: () => Navigator.pushNamed(context, '/view-sales'),
+              onTap: () {},
             ),
             ActionCard(
               icon: Icons.inventory_2,
-              title: 'Mi Inventario',
-              subtitle: 'Consultar stock',
+              title: 'Ver Inventario',
+              subtitle: 'Transferencias',
               color: AppColors.purpleAccent,
-              onTap: () => Navigator.pushNamed(context, '/view-stock'),
+              onTap: () {},
             ),
             ActionCard(
-              icon: Icons.calculate,
-              title: 'Calculadora',
-              subtitle: 'Calcular precios',
+              icon: Icons.analytics,
+              title: 'Reportes',
+              subtitle: 'Análisis de datos',
+              color: AppColors.successGreen,
+              onTap: () {},
+            ),
+            ActionCard(
+              icon: Icons.account_balance,
+              title: 'Contabilidad',
+              subtitle: 'Registros financieros',
               color: AppColors.primaryGold,
-              onTap: () => Navigator.pushNamed(context, '/calculator'),
+              onTap: () {},
             ),
           ],
         ),
@@ -154,12 +148,12 @@ class VendorDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsCards() {
+  Widget _buildStatsOverview() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Resumen del Día',
+          'Resumen General',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -167,46 +161,37 @@ class VendorDashboardScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1.5,
           children: [
-            Expanded(
-              child: StatCard(
-                title: 'Ventas Hoy',
-                value: '8',
-                icon: Icons.trending_up,
-                color: AppColors.successGreen,
-              ),
+            StatCard(
+              title: 'Total Ventas Hoy',
+              value: '\$12,450',
+              icon: Icons.trending_up,
+              color: AppColors.successGreen,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: StatCard(
-                title: 'Total Vendido',
-                value: '\$3,750',
-                icon: Icons.attach_money,
-                color: AppColors.infoBlue,
-              ),
+            StatCard(
+              title: 'Transferencias',
+              value: '23',
+              icon: Icons.swap_horiz,
+              color: AppColors.infoBlue,
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                title: 'Productos',
-                value: '45',
-                icon: Icons.inventory,
-                color: AppColors.purpleAccent,
-              ),
+            StatCard(
+              title: 'Vendedores Activos',
+              value: '8',
+              icon: Icons.people,
+              color: AppColors.purpleAccent,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: StatCard(
-                title: 'Pendientes',
-                value: '2',
-                icon: Icons.pending,
-                color: AppColors.warningOrange,
-              ),
+            StatCard(
+              title: 'Productos en Stock',
+              value: '156',
+              icon: Icons.inventory,
+              color: AppColors.primaryGold,
             ),
           ],
         ),
@@ -231,27 +216,35 @@ class VendorDashboardScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildActivityItem(
-                'Nueva venta registrada',
-                'REC-008 - \$450.00',
-                'Hace 10 minutos',
-                Icons.add_circle,
+                'Venta #1234',
+                'Vendedor: Juan Pérez',
+                '\$2,340.50',
                 AppColors.successGreen,
+                Icons.receipt_long,
               ),
-              _buildDivider(),
+              const Divider(color: AppColors.divider),
               _buildActivityItem(
-                'Venta verificada',
-                'REC-007 - \$320.00',
-                'Hace 1 hora',
-                Icons.verified,
+                'Transferencia #T567',
+                'Almacén A → Almacén B',
+                '50 unidades',
                 AppColors.infoBlue,
+                Icons.swap_horiz,
               ),
-              _buildDivider(),
+              const Divider(color: AppColors.divider),
               _buildActivityItem(
-                'Inventario actualizado',
-                '15 productos añadidos',
-                'Hace 2 horas',
-                Icons.inventory_2,
-                AppColors.purpleAccent,
+                'Venta #1233',
+                'Vendedor: María García',
+                '\$1,890.00',
+                AppColors.successGreen,
+                Icons.receipt_long,
+              ),
+              const Divider(color: AppColors.divider),
+              _buildActivityItem(
+                'Transferencia #T566',
+                'Almacén B → Tienda',
+                '25 unidades',
+                AppColors.infoBlue,
+                Icons.swap_horiz,
               ),
             ],
           ),
@@ -263,12 +256,12 @@ class VendorDashboardScreen extends StatelessWidget {
   Widget _buildActivityItem(
     String title,
     String subtitle,
-    String time,
-    IconData icon,
+    String value,
     Color color,
+    IconData icon,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
           Container(
@@ -291,14 +284,13 @@ class VendorDashboardScreen extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -307,26 +299,16 @@ class VendorDashboardScreen extends StatelessWidget {
             ),
           ),
           Text(
-            time,
+            value,
             style: TextStyle(
-              fontSize: 11,
-              color: AppColors.textLight,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      color: AppColors.divider,
-      indent: 16,
-      endIndent: 16,
-    );
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,

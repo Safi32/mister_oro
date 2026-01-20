@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/AppColors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigateToLogin() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(context, '/stakeholder-selection');
     }
   }
 
